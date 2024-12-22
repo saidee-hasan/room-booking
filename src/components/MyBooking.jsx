@@ -38,21 +38,30 @@ function MyBooking() {
 
   // Handle Update Date
   const handleUpdateDate = (bookingId) => {
+    setSelectedBooking(bookingId); // Store the bookingId for which the date will be updated
     const updatedBooking = apply.find(item => item._id === bookingId);
-    if (newDate) {
-      fetch(`http://localhost:5000/apply/${bookingId}`, {
-        method: 'PATCH',
+    if (updatedBooking) {
+      setNewDate(updatedBooking.selectedDate); // Set the existing booking date as the initial value
+    }
+    setShowModal(true); // Show the modal for updating the date
+  };
+
+  const confirmUpdateDate = () => {
+    if (newDate && selectedBooking) {
+      fetch(`http://localhost:5000/apply/${selectedBooking}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ selectedDate: newDate }),
       })
         .then(res => res.json())
         .then(() => {
-          updatedBooking.selectedDate = newDate;
           setApply(prevApply => prevApply.map(item =>
-            item._id === bookingId ? updatedBooking : item
+            item._id === selectedBooking ? { ...item, selectedDate: newDate } : item
           ));
           setToastMessage('Booking date updated successfully');
           setShowToast(true);
+          setNewDate(''); // Clear the date input after successful update
+          setShowModal(false); // Close the modal
         })
         .catch(error => console.log(error));
     }
@@ -106,8 +115,13 @@ function MyBooking() {
       {showModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96">
-            <h3 className="text-xl font-bold mb-4">Confirm Cancellation</h3>
-            <p>Are you sure you want to cancel this booking?</p>
+            <h3 className="text-xl font-bold mb-4">Update Booking Date</h3>
+            <input
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="form-control w-full p-2 border border-gray-300 rounded-md"
+            />
             <div className="mt-4 flex justify-between">
               <button
                 onClick={() => setShowModal(false)}
@@ -116,10 +130,10 @@ function MyBooking() {
                 Close
               </button>
               <button
-                onClick={confirmCancel}
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                onClick={confirmUpdateDate}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
               >
-                Confirm
+                Confirm Update
               </button>
             </div>
           </div>
@@ -130,18 +144,6 @@ function MyBooking() {
       {showToast && (
         <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg">
           <p>{toastMessage}</p>
-        </div>
-      )}
-
-      {/* Date picker for updating booking date */}
-      {newDate && (
-        <div className="mt-4">
-          <input
-            type="date"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            className="form-control w-full p-2 border border-gray-300 rounded-md"
-          />
         </div>
       )}
     </div>
