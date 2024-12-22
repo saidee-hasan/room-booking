@@ -36,7 +36,7 @@ function Navbar({ isAuthenticated }) {
               {isAuthenticated && (
                 <li>
                   <NavLink
-                    to="/my-bookings"
+                    to="/my-booking"
                     className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
                   >
                     My Bookings

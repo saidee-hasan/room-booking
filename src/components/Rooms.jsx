@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-function FeaturedRooms() {
+function Rooms() {
   const [rooms , setRooms] = useState([])
   useEffect(()=>{
     fetch('http://localhost:5000/rooms')
@@ -29,12 +30,13 @@ setRooms(data)
               <h3 className="text-xl font-semibold text-gray-800">{room.name}</h3>
               <p className="text-gray-600 text-sm mt-2">{room.description}</p>
               <p className="text-gray-800 font-bold mt-4">${room.price}</p>
-              <button
-                className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 w-full"
-                onClick={() => window.location.href = `/room/${room.id}`} // Redirect to room detail page
+              <Link to={`/rooms/${room._id}`}>  <button
+                className="mt-4 bg-lime-700 text-white py-2 px-4 rounded-md hover:bg-lime-900 transition duration-300 w-full"
+               
               >
                 Book Now
-              </button>
+              </button></Link>
+            
             </div>
           </div>
         ))}
@@ -43,4 +45,4 @@ setRooms(data)
   );
 }
 
-export default FeaturedRooms;
+export default Rooms;
