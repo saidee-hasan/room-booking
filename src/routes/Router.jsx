@@ -8,6 +8,7 @@ import MyBooking from "../components/MyBooking";
 import Register from "../components/Registar";
 import Login from "../components/Login";
 import UserProfile from "../components/UserProfile";
+import UpdateProfile from "../components/UpdateProfile";
 
 
 
@@ -19,6 +20,7 @@ const router =  createBrowserRouter([
         {path:"/",element:<Home/>},
         {path:"/profile",element:<UserProfile/> },
         {path:"/register",element:<Register/>},
+        {path:"/update",element:<UpdateProfile/> },
         {path:"/login",element:<Login/>},
         {path:"/rooms",element:<Rooms/>},
         {path:"/my-bookings",element:<MyBooking/>},
