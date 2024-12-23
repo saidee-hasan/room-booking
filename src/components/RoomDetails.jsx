@@ -8,7 +8,7 @@ import useAuth from '../hooks/useAuth';
 
 function RoomDetails() {
   const data = useLoaderData(); // Fetch room data from the loader
-console.log(data._id)
+
   const {
     name,
     description,
@@ -28,7 +28,9 @@ console.log(data._id)
   const [reviews, setReviews] = useState([]);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
-  const username = 'Logged-in User'; // Replace with actual logged-in username
+  const [apply,setApply] = useState()
+
+// Replace with actual logged-in username
 
   // Fetch reviews on component load
   useEffect(() => {
@@ -37,6 +39,26 @@ console.log(data._id)
       .then(res=>res.json())
       .then(data=>{
         setReviews(data)
+      })
+    };
+
+    fetchReviews();
+  }, [data.id]);
+
+
+  console.log(apply,data)
+
+
+
+
+
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      fetch('http://localhost:5000/apply')
+      .then(res=>res.json())
+      .then(data=>{
+      setApply(data)
       })
     };
 
@@ -66,7 +88,7 @@ console.log(data._id)
     setSelectedRating(value);
 
   };
-
+  const username = user?.displayName; 
   const handleBooking = async () => {
     if (!selectedDate) {
       alert('Please select a booking date.');
@@ -79,7 +101,7 @@ console.log(data._id)
       roomPrice: price,
       selectedDate: selectedDate.toDateString(),
       roomId: data.id,
-      email : data.email,
+      email : user?.email,
       booking_id : data._id
     };
 
@@ -90,7 +112,12 @@ console.log(data._id)
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(bookingData),
-      });
+      })
+      .then(res=>res.json())
+      .then(data => {
+       
+        console.log(data)
+      })
 
       if (response.ok) {
         setAvailability(false);
@@ -123,9 +150,10 @@ console.log(data._id)
     }
     const reviewData = {
       roomId: data._id,
-      username,
+      userName : user.displayName,
       rating: selectedRating,
       comment: reviewComment,
+      email : user.email
 
     };
 
@@ -185,7 +213,7 @@ console.log(data._id)
         <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
         {reviews.map((review, index) => (
           <div key={index} className="mb-4 p-4 bg-gray-100 rounded-lg">
-            <p className="font-bold">{review.username}</p>
+            <p className="font-bold">{user?.displayName}</p>
             <p className="text-yellow-500">{review.rating}★</p>
             
             <p>{review.comment}</p>
