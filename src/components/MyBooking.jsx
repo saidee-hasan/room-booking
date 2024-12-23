@@ -18,12 +18,14 @@ function MyBooking() {
 
  // Handle Cancel Booking
  const handleCancel = (bookingId) => {
- confirmCancel()
+ confirmCancel(bookingId)
+
+
   };
-console.log(selectedBooking)
-  const confirmCancel = () => {
+
+  const confirmCancel = (id)=> {
     // Make an API call to cancel the booking
-    fetch(`http://localhost:5000/apply/${selectedBooking}`, {
+    fetch(`http://localhost:5000/apply/${id}`, {
       method: 'DELETE',
     })
       .then(res => res.json())

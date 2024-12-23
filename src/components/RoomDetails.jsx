@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
-import Rating from 'react-rating-stars-component';
 
+import ReactStars from "react-rating-stars-component";
 import 'react-datepicker/dist/react-datepicker.css';
 
 function RoomDetails() {
@@ -31,7 +31,7 @@ function RoomDetails() {
   // Fetch reviews on component load
   useEffect(() => {
     const fetchReviews = async () => {
-  
+      
     };
 
     fetchReviews();
@@ -45,9 +45,20 @@ function RoomDetails() {
     setIsBookingModalOpen(true);
   };
 
+
+
+
   const closeBookingModal = () => {
     setSelectedDate(null);
     setIsBookingModalOpen(false);
+  };
+
+  const [selectedRating, setSelectedRating] = useState(0);
+
+  const handleRatingChange = (event) => {
+    const value = parseInt(event.target.value, 10);
+    setSelectedRating(value);
+
   };
 
   const handleBooking = async () => {
@@ -97,33 +108,25 @@ function RoomDetails() {
   };
 
   const handleReviewSubmit = async () => {
-    if (reviewRating === 0 || reviewComment.trim() === '') {
-      alert('Please provide a rating and comment.');
-      return;
-    }
+ 
 
     const reviewData = {
-      roomId: data.id,
+      roomId: data._id,
       username,
-      rating: reviewRating,
+      rating: selectedRating,
       comment: reviewComment,
+
     };
 
-    console.log(reviewComment)
-
-    try {
-      const response = await axios.post('/api/reviews', reviewData);
-      if (response.status === 201) {
-        setReviews((prevReviews) => [...prevReviews, response.data]);
-        closeReviewModal();
-        alert('Review submitted successfully!');
-      } else {
-        alert('Failed to submit review.');
-      }
-    } catch (error) {
-      console.error('Error submitting review:', error);
-      alert('An error occurred while submitting your review.');
-    }
+    console.log(reviewData)
+   await fetch('http://localhost:5000/review', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reviewData),
+    });
+  
   };
 
   return (
@@ -245,15 +248,45 @@ function RoomDetails() {
             <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
             <p className="text-gray-700 mb-2">Username: {username}</p>
             <div className="mb-4">
-              fffff
-              <Rating
-                count={5}
-                value={reviewRating}
-                onChange={setReviewRating}
-                size={30}
-                activeColor="#ffd700"
-              />
-            </div>
+            <div className="rating">
+      <input
+        type="radio"
+        name="rating-2"
+        value="1"
+        className="mask mask-star-2 bg-orange-400"
+        onChange={handleRatingChange}
+      />
+      <input
+        type="radio"
+        name="rating-2"
+        value="2"
+        className="mask mask-star-2 bg-orange-400"
+        onChange={handleRatingChange}
+        defaultChecked
+      />
+      <input
+        type="radio"
+        name="rating-2"
+        value="3"
+        className="mask mask-star-2 bg-orange-400"
+        onChange={handleRatingChange}
+      />
+      <input
+        type="radio"
+        name="rating-2"
+        value="4"
+        className="mask mask-star-2 bg-orange-400"
+        onChange={handleRatingChange}
+      />
+      <input
+        type="radio"
+        name="rating-2"
+        value="5"
+        className="mask mask-star-2 bg-orange-400"
+        onChange={handleRatingChange}
+      />
+    </div>
+     </div>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2 mb-4"
               rows="4"
