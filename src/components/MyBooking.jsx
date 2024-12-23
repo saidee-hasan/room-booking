@@ -18,7 +18,27 @@ function MyBooking() {
 
  // Handle Cancel Booking
  const handleCancel = (bookingId) => {
- confirmCancel(bookingId)
+  const booking = apply.find((item) => item._id === bookingId);
+  console.log(booking)
+  if (booking) {
+    const bookingDate = new Date(booking.selectedDate);
+    console.log(bookingDate)
+    const cancelBeforeDate = new Date(bookingDate);
+    console.log(cancelBeforeDate)
+
+    cancelBeforeDate.setDate(cancelBeforeDate.getDate() - 2); // 1 day before booking date
+    console.log(cancelBeforeDate)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set today's date without the time component
+console.log(today)
+    // If today is on or before the cancellation deadline, allow cancellation
+    if (today <= cancelBeforeDate) {
+      confirmCancel(bookingId);
+    } else {
+      setToastMessage('Cancellation period has passed. You can only cancel 2 day before the booked date.');
+      setShowToast(true);
+    }
+  }
 
 
   };

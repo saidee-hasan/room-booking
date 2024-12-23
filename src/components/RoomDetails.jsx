@@ -31,7 +31,11 @@ function RoomDetails() {
   // Fetch reviews on component load
   useEffect(() => {
     const fetchReviews = async () => {
-      
+      fetch('http://localhost:5000/review')
+      .then(res=>res.json())
+      .then(data=>{
+        setReviews(data)
+      })
     };
 
     fetchReviews();
@@ -108,8 +112,11 @@ function RoomDetails() {
   };
 
   const handleReviewSubmit = async () => {
- 
 
+    if (selectedRating === 0 || reviewComment.trim() === '') {
+      alert('Please provide a rating and comment.');
+      return;
+    }
     const reviewData = {
       roomId: data._id,
       username,
