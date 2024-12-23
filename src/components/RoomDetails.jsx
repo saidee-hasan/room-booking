@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 function RoomDetails() {
   const data = useLoaderData(); // Fetch room data from the loader
-
+console.log(data._id)
   const {
     name,
     description,
@@ -17,6 +17,7 @@ function RoomDetails() {
     rating,
     reviewsCount,
     availability: initialAvailability,
+  
   } = data;
 
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -77,6 +78,7 @@ function RoomDetails() {
       roomPrice: price,
       selectedDate: selectedDate.toDateString(),
       roomId: data.id,
+      booking_id : data._id
     };
 
     try {
