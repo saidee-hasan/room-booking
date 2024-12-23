@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 
 import ReactStars from "react-rating-stars-component";
 import 'react-datepicker/dist/react-datepicker.css';
+import useAuth from '../hooks/useAuth';
 
 function RoomDetails() {
   const data = useLoaderData(); // Fetch room data from the loader
@@ -51,7 +52,7 @@ console.log(data._id)
   };
 
 
-
+  const { user } = useAuth();
 
   const closeBookingModal = () => {
     setSelectedDate(null);
@@ -78,6 +79,7 @@ console.log(data._id)
       roomPrice: price,
       selectedDate: selectedDate.toDateString(),
       roomId: data.id,
+      email : data.email,
       booking_id : data._id
     };
 
