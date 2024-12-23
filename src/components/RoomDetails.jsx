@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
+import Rating from 'react-rating-stars-component';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 function RoomDetails() {
   const data = useLoaderData(); // Fetch room data from the loader
- 
 
   const {
     name,
@@ -18,41 +19,52 @@ function RoomDetails() {
     availability: initialAvailability,
   } = data;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [availability, setAvailability] = useState(initialAvailability);
+  const [reviews, setReviews] = useState([]);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const username = 'Logged-in User'; // Replace with actual logged-in username
 
-  const openModal = () => {
+  // Fetch reviews on component load
+  useEffect(() => {
+    const fetchReviews = async () => {
+  
+    };
+
+    fetchReviews();
+  }, [data.id]);
+
+  const openBookingModal = () => {
     if (!availability) {
       alert('This room is currently unavailable for booking.');
       return;
     }
-    setIsModalOpen(true);
+    setIsBookingModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closeBookingModal = () => {
     setSelectedDate(null);
-    setIsModalOpen(false);
+    setIsBookingModalOpen(false);
   };
 
-  // Function to handle booking
   const handleBooking = async () => {
     if (!selectedDate) {
       alert('Please select a booking date.');
       return;
     }
 
-    // Prepare the booking data
     const bookingData = {
       roomName: name,
       roomDescription: description,
       roomPrice: price,
       selectedDate: selectedDate.toDateString(),
-      roomId: data.id, // Assuming each room has a unique id
+      roomId: data.id,
     };
 
     try {
-      // Send booking data to the backend (adjust the API endpoint as needed)
       const response = await fetch('http://localhost:5000/apply', {
         method: 'POST',
         headers: {
@@ -61,12 +73,9 @@ function RoomDetails() {
         body: JSON.stringify(bookingData),
       });
 
-      const responseData = await response.json();
-
       if (response.ok) {
-        // Mark room as unavailable after booking
         setAvailability(false);
-        closeModal();
+        closeBookingModal();
         alert(`Room "${name}" booked successfully for ${selectedDate.toDateString()}!`);
       } else {
         alert('Booking failed. Please try again later.');
@@ -74,6 +83,46 @@ function RoomDetails() {
     } catch (error) {
       console.error('Error booking room:', error);
       alert('An error occurred while processing your booking. Please try again.');
+    }
+  };
+
+  const openReviewModal = () => {
+    setIsReviewModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setReviewRating(0);
+    setReviewComment('');
+    setIsReviewModalOpen(false);
+  };
+
+  const handleReviewSubmit = async () => {
+    if (reviewRating === 0 || reviewComment.trim() === '') {
+      alert('Please provide a rating and comment.');
+      return;
+    }
+
+    const reviewData = {
+      roomId: data.id,
+      username,
+      rating: reviewRating,
+      comment: reviewComment,
+    };
+
+    console.log(reviewComment)
+
+    try {
+      const response = await axios.post('/api/reviews', reviewData);
+      if (response.status === 201) {
+        setReviews((prevReviews) => [...prevReviews, response.data]);
+        closeReviewModal();
+        alert('Review submitted successfully!');
+      } else {
+        alert('Failed to submit review.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('An error occurred while submitting your review.');
     }
   };
 
@@ -113,21 +162,24 @@ function RoomDetails() {
           Rating: <span className="text-yellow-500">{rating}★</span>
         </p>
         <p className="text-lg font-semibold text-gray-900">
-          Reviews: <span className="text-gray-700">{reviewsCount}</span>
+          Reviews: <span className="text-gray-700">{reviews.length}</span>
         </p>
       </div>
 
-      {/* Availability */}
+      {/* Review Section */}
       <div className="mb-6">
-        {availability ? (
-          <p className="text-green-500 font-semibold text-lg">
-            Available for booking
-          </p>
-        ) : (
-          <p className="text-red-500 font-semibold text-lg">
-            Currently unavailable
-          </p>
-        )}
+        <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
+        {reviews.map((review, index) => (
+          <div key={index} className="mb-4 p-4 bg-gray-100 rounded-lg">
+            <p className="font-bold">{review.username}</p>
+            <p className="text-yellow-500">{review.rating}★</p>
+            
+            <p>{review.comment}</p>
+            <small className="text-gray-500">
+              {new Date(review.timestamp).toLocaleString()}
+            </small>
+          </div>
+        ))}
       </div>
 
       {/* Book Now Button */}
@@ -137,18 +189,26 @@ function RoomDetails() {
             ? 'bg-blue-500 text-white hover:bg-blue-600'
             : 'bg-gray-400 text-gray-700 cursor-not-allowed'
         }`}
-        onClick={openModal}
+        onClick={openBookingModal}
         disabled={!availability}
       >
         Book Now
       </button>
 
-      {/* Modal */}
-      {isModalOpen && (
+      {/* Leave a Review Button */}
+      <button
+        className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
+        onClick={openReviewModal}
+      >
+        Give Review
+      </button>
+
+      {/* Booking Modal */}
+      {isBookingModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300">
           <div className="bg-white w-96 rounded-lg shadow-lg p-6 transform transition-all duration-500 ease-in-out scale-110">
             <h2 className="text-2xl font-bold mb-4">Booking Summary</h2>
-            <p className="text-gray-700 mb-2"><span className='font-semibold'>Room Name:</span> {name}</p>
+            <p className="text-gray-700 mb-2">Room Name: {name}</p>
             <p className="text-gray-700 mb-2">Price: ${price} / night</p>
             <p className="text-gray-600 mb-4">Description: {description}</p>
             <div className="mb-4">
@@ -169,7 +229,48 @@ function RoomDetails() {
               </button>
               <button
                 className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300"
-                onClick={closeModal}
+                onClick={closeBookingModal}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300">
+          <div className="bg-white w-96 rounded-lg shadow-lg p-6 transform transition-all duration-500 ease-in-out scale-110">
+            <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
+            <p className="text-gray-700 mb-2">Username: {username}</p>
+            <div className="mb-4">
+              fffff
+              <Rating
+                count={5}
+                value={reviewRating}
+                onChange={setReviewRating}
+                size={30}
+                activeColor="#ffd700"
+              />
+            </div>
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-2 mb-4"
+              rows="4"
+              placeholder="Write your review here..."
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+            ></textarea>
+            <div className="flex items-center justify-between">
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
+                onClick={handleReviewSubmit}
+              >
+                Submit Review
+              </button>
+              <button
+                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300"
+                onClick={closeReviewModal}
               >
                 Cancel
               </button>

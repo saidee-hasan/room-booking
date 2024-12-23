@@ -16,13 +16,13 @@ function MyBooking() {
       .catch(error => console.log(error));
   }, []);
 
-  // Handle Cancel Booking
-  const handleCancel = (bookingId) => {
-    setSelectedBooking(bookingId);
-    setShowModal(true);
+ // Handle Cancel Booking
+ const handleCancel = (bookingId) => {
+ confirmCancel()
   };
-
+console.log(selectedBooking)
   const confirmCancel = () => {
+    // Make an API call to cancel the booking
     fetch(`http://localhost:5000/apply/${selectedBooking}`, {
       method: 'DELETE',
     })
@@ -96,6 +96,11 @@ function MyBooking() {
                   >
                     Cancel
                   </button>
+
+
+
+
+                  
                   <button
                     onClick={() => handleUpdateDate(booking._id)}
                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
