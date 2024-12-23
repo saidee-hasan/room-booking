@@ -6,6 +6,7 @@ import RoomDetails from "../components/RoomDetails";
 import Rooms from "../components/Rooms";
 import MyBooking from "../components/MyBooking";
 import Register from "../components/Registar";
+import Login from "../components/Login";
 
 
 
@@ -16,6 +17,7 @@ const router =  createBrowserRouter([
 
         {path:"/",element:<Home/>},
         {path:"/register",element:<Register/>},
+        {path:"/login",element:<Login/>},
         {path:"/rooms",element:<Rooms/>},
         {path:"/my-bookings",element:<MyBooking/>},
         {path:"/rooms/:id",element:<RoomDetails/>  ,loader:({params})=> fetch(`http://localhost:5000/rooms/${params.id}`)},

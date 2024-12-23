@@ -1,7 +1,15 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { AuthContext } from '../provider/AuthProvider';
 
 function Navbar({ isAuthenticated }) {
+  const { user, signOutUser  } = useContext(AuthContext);
+
+  const handleSignOut = () => {
+      signOutUser ()
+          .then(res => console.log(res))
+          .catch(err => console.error(err));
+  };
   return (
     <div>
       <div className="navbar bg-base-100">
@@ -52,6 +60,14 @@ function Navbar({ isAuthenticated }) {
 
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
+          <li>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
+              >
+               Home
+              </NavLink>
+            </li>
             <li>
               <NavLink
                 to="/rooms"
@@ -74,10 +90,39 @@ function Navbar({ isAuthenticated }) {
         </div>
 
         <div className="navbar-end">
-          <NavLink to="/register" className="btn">
-            Login
-          </NavLink>
-        </div>
+                {
+                    user ? (
+                        <button
+                            className='bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition duration-200'
+                            onClick={handleSignOut}
+                            aria-label="Sign Out"
+                        >
+                            Sign Out
+                        </button>
+                    ) : (
+                        <Link to={'/register'}>
+                            <button
+                                className='bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition duration-200'
+                                aria-label="Login"
+                            >
+                                Login
+                            </button>
+                        </Link>
+                    )
+                }
+                <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                        <div className="w-10 rounded-full overflow-hidden border-2 border-gray-300">
+                            <Link to={'/profile'}>
+                                <img
+                                    alt="User  Avatar"
+                                    src={user?.photoURL || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKKOdmJz8Z2pDtYgFgR2u9spABvNNPKYYtGw&s'} // Provide a default image path
+                                />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
       </div>
       <hr />
       
