@@ -74,7 +74,7 @@ function Navbar({ isAuthenticated }) {
         </div>
 
         <div className="navbar-end">
-          <NavLink to="/login" className="btn">
+          <NavLink to="/register" className="btn">
             Login
           </NavLink>
         </div>
