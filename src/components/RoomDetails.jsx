@@ -12,6 +12,20 @@ function RoomDetails() {
 
   const data = useLoaderData();
 
+const [dat,setDat]=useState([])
+
+  // Fetching booking data
+  useEffect(() => {
+    fetch(`http://localhost:5000/apply?email=${user?.email}`)
+      .then(res => res.json())
+      .then(data =>{
+        setDat(data)
+      })
+      .catch(error => console.log(error));
+  }, []);
+
+  const singleRevi = dat.filter(user => user.booking_id == data._id);
+ 
 
   const {
     name,
@@ -224,14 +238,13 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
 
       {/* Leave a Review Button */}
       {
- 
- singleReviews.length > 0 ?
+         
    <button
         className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
         onClick={openReviewModal}
       >
         Give Review
-      </button>:<p>No reviews available.</p>
+      </button>
       }
   
 
