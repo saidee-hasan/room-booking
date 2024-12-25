@@ -3,6 +3,7 @@ import Banner from "../components/Banner";
 import Map from "../components/Map";
 import FeaturedRooms from "../components/Rooms";
 import SpecialOffersModal from "../components/SpecialOffersModal";
+import TestimonialCarousel from "../components/TestimonialCarousel";
 
 function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,12 +17,13 @@ function Home() {
     <div className="container mx-auto">
       {/* Special Offers Modal */}
       {isModalOpen && (
-        <SpecialOffersModal onClose={() => setIsModalOpen(false)} />
+        <SpecialOffersModal  onClose={() => setIsModalOpen(false)} />
       )}
 
       <Banner />
       <Map />
       <FeaturedRooms />
+      <TestimonialCarousel/>
     </div>
   );
 }

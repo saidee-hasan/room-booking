@@ -36,7 +36,7 @@ function Map() {
       </div>
 
       {/* Map Section */}
-      <div className="w-full h-96 md:h-auto flex-1 rounded-lg overflow-hidden shadow-md">
+      <div className="w-full h-96 md:h-auto  z-0 flex-1 rounded-lg overflow-hidden shadow-md">
         <MapContainer
           center={position}
           zoom={13}
