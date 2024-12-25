@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import ReactStars from "react-rating-stars-component";
 import 'react-datepicker/dist/react-datepicker.css';
 import useAuth from '../hooks/useAuth';
+import Review from './Review';
 
 function RoomDetails() {
   const { user } = useAuth();
@@ -24,7 +25,7 @@ const [dat,setDat]=useState([])
       .catch(error => console.log(error));
   }, []);
 
-  const singleRevi = dat.filter(user => user.booking_id == data._id);
+  const hiddenCom = dat.filter(user => user.booking_id == data._id);
  
 
   const {
@@ -206,22 +207,7 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
         </p>
       </div>
 
-      {/* Review Section */}
-      <div className="mb-6">
-        <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
-        {singleReviews.map((review, index) => (
-          <div key={index} className="mb-4 p-4 bg-gray-100 rounded-lg">
-            <p className="font-bold">{user?.displayName}</p>
-            <p className="text-yellow-500">{review.rating}★</p>
-            
-            <p>{review.comment}</p>
-            <small className="text-gray-500">
-   
-              {new Date(review.timestamp).toLocaleString()}
-            </small>
-          </div>
-        ))}
-      </div>
+    
 
       {/* Book Now Button */}
       <button
@@ -237,16 +223,27 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
       </button>
 
       {/* Leave a Review Button */}
-      {
+      
          
-   <button
-        className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
-        onClick={openReviewModal}
-      >
-        Give Review
-      </button>
-      }
-  
+         {
+
+         hiddenCom.length > 0 ?   <button
+         className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
+         onClick={openReviewModal}
+       >
+         Give Review
+       </button>:''
+          
+         }
+ 
+      
+    {/* Review Section */}
+    <div className="mb-6">
+        <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
+        {singleReviews.map((review, index) => (
+          <Review key={index} review={review}/>
+        ))}
+      </div>
 
       {/* Booking Modal */}
       {isBookingModalOpen && (
