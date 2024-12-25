@@ -39,7 +39,6 @@ console.log(data._id,reviews)
 const singleReviews = reviews.filter(user => user.roomId == data._id);
 
 
-console.log(admins);
   useEffect(() => {
     const fetchReviews = async () => {
       fetch('http://localhost:5000/review')
@@ -189,7 +188,7 @@ console.log(admins);
           Rating: <span className="text-yellow-500">{rating}★</span>
         </p>
         <p className="text-lg font-semibold text-gray-900">
-          Reviews: <span className="text-gray-700">{reviews.length}</span>
+          Reviews: <span className="text-gray-700">{singleReviews.length}</span>
         </p>
       </div>
 
