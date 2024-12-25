@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLoaderData, useParams } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 
 import ReactStars from "react-rating-stars-component";
@@ -7,31 +7,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import useAuth from '../hooks/useAuth';
 
 function RoomDetails() {
+  const { user } = useAuth();
+
+
   const data = useLoaderData();
-  const id = useParams();
-  
-
-  fetch('http://localhost:5000/apply')
-  .then(res => {
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-    return res.json();
-  })
-  .then(data => {
-    // Process the fetched data here
-    console.log(data);
-    // You can add your logic to handle the data
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error);
-    alert('An error occurred while fetching data. Please try again later.');
-  });
-
-console.log(data._id)
-
-
-
 
 
   const {
@@ -55,7 +34,12 @@ console.log(data._id)
   const [reviewComment, setReviewComment] = useState('');
 // Replace with actual logged-in username
 
-  // Fetch reviews on component load
+
+console.log(data._id,reviews)
+const singleReviews = reviews.filter(user => user.roomId == data._id);
+
+
+console.log(admins);
   useEffect(() => {
     const fetchReviews = async () => {
       fetch('http://localhost:5000/review')
@@ -77,7 +61,7 @@ console.log(data._id)
   };
 
 
-  const { user } = useAuth();
+
 
   const closeBookingModal = () => {
     setSelectedDate(null);
@@ -212,7 +196,7 @@ console.log(data._id)
       {/* Review Section */}
       <div className="mb-6">
         <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
-        {reviews.map((review, index) => (
+        {singleReviews.map((review, index) => (
           <div key={index} className="mb-4 p-4 bg-gray-100 rounded-lg">
             <p className="font-bold">{user?.displayName}</p>
             <p className="text-yellow-500">{review.rating}★</p>
