@@ -8,10 +8,11 @@ function MyBooking() {
   const [newDate, setNewDate] = useState('');
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const {user} = useAuth();
 
   // Fetching booking data
   useEffect(() => {
-    fetch('http://localhost:5000/apply')
+    fetch(`http://localhost:5000/apply?email=${user?.email}`)
       .then(res => res.json())
       .then(data => setApply(data))
       .catch(error => console.log(error));
