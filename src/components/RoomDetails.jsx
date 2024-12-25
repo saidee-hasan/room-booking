@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import useAuth from '../hooks/useAuth';
@@ -8,7 +8,7 @@ import Review from './Review';
 function RoomDetails() {
   const { user } = useAuth();
   const data = useLoaderData();
-
+const {pramsId} = useParams();
   const [bookingData, setBookingData] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -58,7 +58,18 @@ function RoomDetails() {
   const userHasBooking = bookingData.some((booking) => booking.booking_id === roomId);
 
   
-  const singleReviews = reviews.filter((review) => review.roomId === roomId);
+  useEffect(()=>{
+    fetch(`http://localhost:5000/review?roomId=6767ee034c512ec720f83a90`)
+    .then(res=>res.json())
+    .then(data=>{
+    console.log(data)
+    })
+
+
+  },[])
+
+
+  
 
   const openBookingModal = () => {
     if (!availability) {
@@ -192,7 +203,7 @@ function RoomDetails() {
           Rating: <span className="text-yellow-500">{rating}★</span>
         </p>
         <p className="text-lg font-semibold text-gray-900">
-          Reviews: <span className="text-gray-700">{singleReviews.length}</span>
+          Reviews: <span className="text-gray-700">{reviews.length}</span>
         </p>
       </div>
 
@@ -294,7 +305,7 @@ function RoomDetails() {
       )}
         <div className="mb-6">
         <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
-        {singleReviews.map((review, index) => (
+        {reviews.map((review, index) => (
           <Review key={index} review={review} />
         ))}
       </div>
