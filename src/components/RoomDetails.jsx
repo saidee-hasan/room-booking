@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLoaderData, useParams } from 'react-router-dom';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import useAuth from '../hooks/useAuth';
@@ -14,9 +14,9 @@ const {id} = useParams();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedRating, setSelectedRating] = useState(0);
+  const [selectedRating, setSelectedRating] = useState(4);
   const [reviewComment, setReviewComment] = useState('');
-
+const navigate = useNavigate()
   const {
     _id: roomId,
     name,
@@ -111,7 +111,8 @@ const {id} = useParams();
         console.log(result);
         setAvailability(false);
         closeBookingModal();
-        alert(`Room "${name}" booked successfully for ${selectedDate.toDateString()}!`);
+        navigate('/my-bookings')
+        
       } else {
         const errorData = await res.json();
         alert(`Booking failed: ${errorData.message || 'Please try again later.'}`);
@@ -127,7 +128,7 @@ const {id} = useParams();
   };
 
   const closeReviewModal = () => {
-    setSelectedRating(0);
+    setSelectedRating(4);
     setReviewComment('');
     setIsReviewModalOpen(false);
   };
@@ -140,6 +141,7 @@ const {id} = useParams();
 
     const reviewDetails = {
       roomId,
+      images : user?.photoURL,
       userName: user?.displayName,
       rating: selectedRating,
       comment: reviewComment,
@@ -172,55 +174,59 @@ const {id} = useParams();
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-8 bg-white text-gray-800 shadow-lg rounded-lg">
-      <div className="mb-6">
-        <img
-          src={images}
-          alt={name}
-          className="w-full h-64 object-cover rounded-lg shadow-md transition-transform transform hover:scale-105"
-        />
-      </div>
+  {/* Property Image */}
+  <div className="mb-6">
+    <img
+      src={images}
+      alt={name}
+      className="w-full h-64 object-cover rounded-lg shadow-md transition-transform transform hover:scale-105"
+    />
+  </div>
 
-      <h2 className="text-3xl font-bold mb-4 text-gray-900">{name}</h2>
-      <p className="text-lg text-gray-600 mb-4">{description}</p>
-      <p className="text-xl font-semibold mb-4">
-        Price: <span className="text-blue-500">${price} / night</span>
-      </p>
+  {/* Property Details */}
+  <h2 className="text-3xl font-bold mb-4 text-gray-900">{name}</h2>
+  <p className="text-lg text-gray-600 mb-4">{description}</p>
+  <p className="text-xl font-semibold mb-4">
+    Price: <span className="text-blue-500">${price} / night</span>
+  </p>
 
-      <div className="mb-4">
-        <h3 className="text-2xl font-semibold mb-3 text-gray-900">Features:</h3>
-        <ul className="list-disc pl-6 space-y-2">
-          {features.map((feature, index) => (
-            <li key={index} className="text-lg text-gray-700">
-              {feature}
-            </li>
-          ))}
-        </ul>
-      </div>
+  {/* Features List */}
+  <div className="mb-4">
+    <h3 className="text-2xl font-semibold mb-3 text-gray-900">Features:</h3>
+    <ul className="list-disc pl-6 space-y-2">
+      {features.map((feature, index) => (
+        <li key={index} className="text-lg text-gray-700">
+          {feature}
+        </li>
+      ))}
+    </ul>
+  </div>
 
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-lg font-semibold text-gray-900">
-          Rating: <span className="text-yellow-500">{rating}★</span>
-        </p>
-        <p className="text-lg font-semibold text-gray-900">
-          Reviews: <span className="text-gray-700">{reviews.length}</span>
-        </p>
-      </div>
+  {/* Rating and Reviews */}
+  <div className="flex items-center justify-between mb-6">
+    <p className="text-lg font-semibold text-gray-900">
+      Rating: <span className="text-yellow-500">{rating}★</span>
+    </p>
+    <p className="text-lg font-semibold text-gray-900">
+      Reviews: <span className="text-gray-700">{reviews.length}</span>
+    </p>
+  </div>
 
-      <button
-  className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 ${
-    showBtn.length <= 0
-      ? 'bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-300'
-      : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-  }`}
-  onClick={openBookingModal}
-  disabled={showBtn.length > 0}
->
-  {showBtn.length > 0 ? 'Booking Unavailable' : 'Book Now'}
-</button>
+  {/* Book Now Button */}
+  <button
+    className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 ${
+      showBtn.length <= 0
+        ? 'bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-300'
+        : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+    }`}
+    onClick={openBookingModal}
+    disabled={showBtn.length > 0}
+  >
+    {showBtn.length > 0 ? 'Booking Unavailable' : 'Book Now'}
+  </button>
 
-
-{
-  showBtn.length > 0 ? (
+  {/* Give Review Button */}
+  {showBtn.length > 0 ? (
     <button
       className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md transition-transform transform hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
       onClick={openReviewModal}
@@ -228,96 +234,97 @@ const {id} = useParams();
     >
       Give Review
     </button>
-  ) : (
-    ''
-  )
-}
+  ) : null}
 
-
-
-
-    
-
-      {isBookingModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white w-96 rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Booking Summary</h2>
-            <p className="text-gray-700 mb-2">Room Name: {name}</p>
-            <p className="text-gray-700 mb-2">Price: ${price} / night</p>
-            <DatePicker
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              className="w-full border border-gray-300 rounded-md p-2"
-              minDate={new Date()}
-            />
-            <div className="flex items-center justify-between mt-4">
-              <button
-                className="bg-blue-500 text-white py-2 px-4 rounded-md"
-                onClick={handleBooking}
-              >
-                Confirm Booking
-              </button>
-              <button
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
-                onClick={closeBookingModal}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+  {/* Booking Modal */}
+  {isBookingModalOpen && (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-white w-96 rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4">Booking Summary</h2>
+        <p className="text-gray-700 mb-2">Room Name: {name}</p>
+        <p className="text-gray-700 mb-2">Price: ${price} / night</p>
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          className="w-full border border-gray-300 rounded-md p-2"
+          minDate={new Date()}
+        />
+        <div className="flex items-center justify-between mt-4">
+          <button
+            className="bg-blue-500 text-white py-2 px-4 rounded-md"
+            onClick={handleBooking}
+          >
+            Confirm Booking
+          </button>
+          <button
+            className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
+            onClick={closeBookingModal}
+          >
+            Cancel
+          </button>
         </div>
-      )}
-
-      {isReviewModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white w-96 rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
-            <div className="mb-4">
-              <div className="rating">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <input
-                    key={star}
-                    type="radio"
-                    name="rating"
-                    value={star}
-                    className="mask mask-star-2 bg-orange-400"
-                    defaultValue={2}
-                    onChange={() => setSelectedRating(star)}
-                  />
-                ))}
-              </div>
-            </div>
-            <textarea
-              className="w-full border border-gray-300 rounded-md p-2 mb-4"
-              rows="4"
-              placeholder="Write your review here..."
-              value={reviewComment}
-              onChange={(e) => setReviewComment(e.target.value)}
-            ></textarea>
-            <div className="flex items-center justify-between">
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded-md"
-                onClick={handleReviewSubmit}
-              >
-                Submit Review
-              </button>
-              <button
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
-                onClick={closeReviewModal}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-        <div className="mb-6">
-        <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
-        {reviews.map((review, index) => (
-          <Review key={index} review={review} />
-        ))}
       </div>
     </div>
+  )}
+
+  {/* Review Modal */}
+  {isReviewModalOpen && (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-white w-96 rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
+        <h4>Name: {user?.displayName}</h4>
+        <div className="mb-4">
+          <div className="rating">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <input
+                key={star}
+                type="radio"
+                name="rating"
+                value={star}
+                className="mask mask-star-2 bg-orange-400"
+                checked={selectedRating === star}
+                onChange={() => setSelectedRating(star)}  // Dynamically set the rating
+              />
+            ))}
+          </div>
+        </div>
+        <textarea
+          className="w-full border border-gray-300 rounded-md p-2 mb-4"
+          rows="4"
+          placeholder="Write your review here..."
+          value={reviewComment}
+          onChange={(e) => setReviewComment(e.target.value)}  // Bind to the review comment state
+        ></textarea>
+        <div className="flex items-center justify-between">
+          <button
+            className="bg-green-500 text-white py-2 px-4 rounded-md"
+            onClick={handleReviewSubmit}  // Submit review
+          >
+            Submit Review
+          </button>
+          <button
+            className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
+            onClick={closeReviewModal}  // Close review modal
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+<br />
+<br />
+<br />
+  {/* Display Reviews */}
+  <div className="mb-6">
+    <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
+    {reviews.map((review, index) => (
+      <Review key={index} review={review} />  // Render Review component
+    ))}
+  </div>
+</div>
+
+   
   );
 }
 
