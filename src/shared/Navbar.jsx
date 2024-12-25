@@ -53,8 +53,8 @@ function Navbar({ isAuthenticated }) {
               )}
             </ul>
           </div>
-          <NavLink to="/" className="btn btn-ghost text-xl">
-            daisyUI
+          <NavLink to="/" className="btn btn-ghost text-xl font-bold">
+   Room <span className='text-red-500'> Booking</span>
           </NavLink>
         </div>
 

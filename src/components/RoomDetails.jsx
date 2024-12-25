@@ -7,7 +7,41 @@ import 'react-datepicker/dist/react-datepicker.css';
 import useAuth from '../hooks/useAuth';
 
 function RoomDetails() {
-  const data = useLoaderData(); // Fetch room data from the loader
+  const data = useLoaderData();
+  
+  
+  
+  useEffect(() => {
+    fetch('http://localhost:5000/rooms')
+      .then(res => res.json())
+      .then(data => setRooms(data))
+      .catch(error => console.error('Error fetching rooms:', error));
+  }, []);
+  
+ 
+
+  fetch('http://localhost:5000/apply')
+  .then(res => {
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
+    }
+    return res.json();
+  })
+  .then(data => {
+    // Process the fetched data here
+    console.log(data);
+    // You can add your logic to handle the data
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+    alert('An error occurred while fetching data. Please try again later.');
+  });
+
+console.log(data._id)
+
+
+
+
 
   const {
     name,
@@ -28,8 +62,6 @@ function RoomDetails() {
   const [reviews, setReviews] = useState([]);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
-  const [apply,setApply] = useState()
-
 // Replace with actual logged-in username
 
   // Fetch reviews on component load
@@ -46,24 +78,8 @@ function RoomDetails() {
   }, [data.id]);
 
 
-  console.log(apply,data)
 
-
-
-
-
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      fetch('http://localhost:5000/apply')
-      .then(res=>res.json())
-      .then(data=>{
-      setApply(data)
-      })
-    };
-
-    fetchReviews();
-  }, [data.id]);
+  
 
   const openBookingModal = () => {
     if (!availability) {
@@ -94,17 +110,17 @@ function RoomDetails() {
       alert('Please select a booking date.');
       return;
     }
-
+  
     const bookingData = {
       roomName: name,
       roomDescription: description,
       roomPrice: price,
       selectedDate: selectedDate.toDateString(),
       roomId: data.id,
-      email : user?.email,
-      booking_id : data._id
+      email: user?.email,
+      booking_id: data._id,
     };
-
+  
     try {
       const response = await fetch('http://localhost:5000/apply', {
         method: 'POST',
@@ -112,25 +128,36 @@ function RoomDetails() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(bookingData),
-      })
-      .then(res=>res.json())
-      .then(data => {
-       
-        console.log(data)
-      })
-
+      });
+  
       if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+  
+        // Update room availability here after successful booking
         setAvailability(false);
+        
+        // Update availability in the database (call the backend API to update the room status)
+        await fetch(`http://localhost:5000/rooms/${data.roomId}`, {
+          method: 'PATCH', // Assuming a PATCH request to update room
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ availability: false }),
+        });
+  
         closeBookingModal();
         alert(`Room "${name}" booked successfully for ${selectedDate.toDateString()}!`);
       } else {
-        alert('Booking failed. Please try again later.');
+        const errorData = await response.json();
+        alert(`Booking failed: ${errorData.message || 'Please try again later.'}`);
       }
     } catch (error) {
       console.error('Error booking room:', error);
       alert('An error occurred while processing your booking. Please try again.');
     }
   };
+  
 
   const openReviewModal = () => {
     setIsReviewModalOpen(true);
@@ -218,6 +245,7 @@ function RoomDetails() {
             
             <p>{review.comment}</p>
             <small className="text-gray-500">
+   
               {new Date(review.timestamp).toLocaleString()}
             </small>
           </div>
