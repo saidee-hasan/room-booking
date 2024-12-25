@@ -8,7 +8,7 @@ import Review from './Review';
 function RoomDetails() {
   const { user } = useAuth();
   const data = useLoaderData();
-const {pramsId} = useParams();
+const {id} = useParams();
   const [bookingData, setBookingData] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -40,29 +40,20 @@ const {pramsId} = useParams();
     }
   };
 
-  const fetchReviews = async () => {
-    try {
-      const res = await fetch('http://localhost:5000/review');
-      const result = await res.json();
-      setReviews(result);
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
-    }
-  };
+
 
   useEffect(() => {
     fetchBookingData();
-    fetchReviews();
   }, [user?.email]);
 
-  const userHasBooking = bookingData.some((booking) => booking.booking_id === roomId);
-
   
+
+  console.log(id)
   useEffect(()=>{
-    fetch(`http://localhost:5000/review?roomId=6767ee034c512ec720f83a90`)
+    fetch(`http://localhost:5000/review?roomId=${id}`)
     .then(res=>res.json())
     .then(data=>{
-    console.log(data)
+   setReviews(data)
     })
 
 
@@ -147,6 +138,7 @@ const {pramsId} = useParams();
       rating: selectedRating,
       comment: reviewComment,
       email: user?.email,
+      timestamp :  new Date()
     };
 
     try {
@@ -170,6 +162,7 @@ const {pramsId} = useParams();
       alert('An error occurred while submitting your review. Please try again.');
     }
   };
+  console.log(reviews)
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-8 bg-white text-gray-800 shadow-lg rounded-lg">
@@ -219,14 +212,14 @@ const {pramsId} = useParams();
         Book Now
       </button>
 
-      {userHasBooking && (
-        <button
-          className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
-          onClick={openReviewModal}
-        >
-          Give Review
-        </button>
-      )}
+      
+  <button
+    className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
+    onClick={openReviewModal}
+  >
+    Give Review
+  </button>
+
 
     
 
