@@ -1,5 +1,6 @@
 import Banner from "../components/Banner"
 import Map from "../components/Map"
+
 import FeaturedRooms from "../components/Rooms"
 
 function Home() {
@@ -8,6 +9,7 @@ function Home() {
     <Banner></Banner>
     <Map/>
     <FeaturedRooms/>
+   
     </div>
   )
 }

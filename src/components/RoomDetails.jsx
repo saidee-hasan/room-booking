@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 
 import ReactStars from "react-rating-stars-component";
@@ -8,17 +8,8 @@ import useAuth from '../hooks/useAuth';
 
 function RoomDetails() {
   const data = useLoaderData();
+  const id = useParams();
   
-  
-  
-  useEffect(() => {
-    fetch('http://localhost:5000/rooms')
-      .then(res => res.json())
-      .then(data => setRooms(data))
-      .catch(error => console.error('Error fetching rooms:', error));
-  }, []);
-  
- 
 
   fetch('http://localhost:5000/apply')
   .then(res => {
@@ -77,10 +68,6 @@ console.log(data._id)
     fetchReviews();
   }, [data.id]);
 
-
-
-  
-
   const openBookingModal = () => {
     if (!availability) {
       alert('This room is currently unavailable for booking.');
@@ -131,25 +118,13 @@ console.log(data._id)
       });
   
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json(); // Parse the response only if the request was successful
         console.log(data);
-  
-        // Update room availability here after successful booking
         setAvailability(false);
-        
-        // Update availability in the database (call the backend API to update the room status)
-        await fetch(`http://localhost:5000/rooms/${data.roomId}`, {
-          method: 'PATCH', // Assuming a PATCH request to update room
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ availability: false }),
-        });
-  
         closeBookingModal();
         alert(`Room "${name}" booked successfully for ${selectedDate.toDateString()}!`);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json(); // Get error details if available
         alert(`Booking failed: ${errorData.message || 'Please try again later.'}`);
       }
     } catch (error) {
@@ -157,7 +132,6 @@ console.log(data._id)
       alert('An error occurred while processing your booking. Please try again.');
     }
   };
-  
 
   const openReviewModal = () => {
     setIsReviewModalOpen(true);
