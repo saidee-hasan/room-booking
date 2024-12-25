@@ -223,12 +223,17 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
       </button>
 
       {/* Leave a Review Button */}
-      <button
+      {
+ 
+ singleReviews.length > 0 ?
+   <button
         className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
         onClick={openReviewModal}
       >
         Give Review
-      </button>
+      </button>:<p>No reviews available.</p>
+      }
+  
 
       {/* Booking Modal */}
       {isBookingModalOpen && (
