@@ -2,14 +2,12 @@ import React from 'react'
 import useAuth from '../hooks/useAuth'
 
 function Review({review}) {
-    console.log(review
 
-    )
     const {user} = useAuth()
   return (
     <div>
         <div className="mb-6">
-
+        
   
           <div  className="mb-4 p-4 bg-gray-100 rounded-lg">
             <p className="font-bold">{review.userName}</p>

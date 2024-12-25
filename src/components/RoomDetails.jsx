@@ -1,70 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
-
-import ReactStars from "react-rating-stars-component";
 import 'react-datepicker/dist/react-datepicker.css';
 import useAuth from '../hooks/useAuth';
 import Review from './Review';
 
 function RoomDetails() {
   const { user } = useAuth();
-
-
   const data = useLoaderData();
 
-const [dat,setDat]=useState([])
-
-  // Fetching booking data
-  useEffect(() => {
-    fetch(`http://localhost:5000/apply?email=${user?.email}`)
-      .then(res => res.json())
-      .then(data =>{
-        setDat(data)
-      })
-      .catch(error => console.log(error));
-  }, []);
-
-  const hiddenCom = dat.filter(user => user.booking_id == data._id);
- 
+  const [bookingData, setBookingData] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
 
   const {
+    _id: roomId,
     name,
     description,
     price,
     features,
     images,
     rating,
-    reviewsCount,
     availability: initialAvailability,
-  
   } = data;
 
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
   const [availability, setAvailability] = useState(initialAvailability);
-  const [reviews, setReviews] = useState([]);
-  const [reviewRating, setReviewRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState('');
-// Replace with actual logged-in username
 
+  const fetchBookingData = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/apply?email=${user?.email}`);
+      const result = await res.json();
+      setBookingData(result);
+    } catch (error) {
+      console.error('Error fetching booking data:', error);
+    }
+  };
 
-console.log(data._id,reviews)
-const singleReviews = reviews.filter(user => user.roomId == data._id);
-
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/review');
+      const result = await res.json();
+      setReviews(result);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      fetch('http://localhost:5000/review')
-      .then(res=>res.json())
-      .then(data=>{
-        setReviews(data)
-      })
-    };
-
+    fetchBookingData();
     fetchReviews();
-  }, [data.id]);
+  }, [user?.email]);
+
+  const userHasBooking = bookingData.some((booking) => booking.booking_id === roomId);
+  const singleReviews = reviews.filter((review) => review.roomId === roomId);
 
   const openBookingModal = () => {
     if (!availability) {
@@ -74,60 +66,49 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
     setIsBookingModalOpen(true);
   };
 
-
-
-
   const closeBookingModal = () => {
     setSelectedDate(null);
     setIsBookingModalOpen(false);
   };
 
-  const [selectedRating, setSelectedRating] = useState(0);
-
-  const handleRatingChange = (event) => {
-    const value = parseInt(event.target.value, 10);
-    setSelectedRating(value);
-
-  };
-  const username = user?.displayName; 
   const handleBooking = async () => {
     if (!selectedDate) {
       alert('Please select a booking date.');
       return;
     }
-  
-    const bookingData = {
+
+    const bookingDetails = {
       roomName: name,
       roomDescription: description,
       roomPrice: price,
       selectedDate: selectedDate.toDateString(),
-      roomId: data.id,
+      roomId,
       email: user?.email,
-      booking_id: data._id,
+      booking_id: roomId,
     };
-  
+
     try {
-      const response = await fetch('http://localhost:5000/apply', {
+      const res = await fetch('http://localhost:5000/apply', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify(bookingDetails),
       });
-  
-      if (response.ok) {
-        const data = await response.json(); // Parse the response only if the request was successful
-        console.log(data);
+
+      if (res.ok) {
+        const result = await res.json();
+        console.log(result);
         setAvailability(false);
         closeBookingModal();
         alert(`Room "${name}" booked successfully for ${selectedDate.toDateString()}!`);
       } else {
-        const errorData = await response.json(); // Get error details if available
+        const errorData = await res.json();
         alert(`Booking failed: ${errorData.message || 'Please try again later.'}`);
       }
     } catch (error) {
       console.error('Error booking room:', error);
-      alert('An error occurred while processing your booking. Please try again.');
+      alert('An error occurred while booking. Please try again.');
     }
   };
 
@@ -136,40 +117,49 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
   };
 
   const closeReviewModal = () => {
-    setReviewRating(0);
+    setSelectedRating(0);
     setReviewComment('');
     setIsReviewModalOpen(false);
   };
 
   const handleReviewSubmit = async () => {
-
-    if (selectedRating === 0 || reviewComment.trim() === '') {
-      alert('Please provide a rating and comment.');
+    if (!selectedRating || !reviewComment.trim()) {
+      alert('Please provide both a rating and a comment.');
       return;
     }
-    const reviewData = {
-      roomId: data._id,
-      userName : user.displayName,
+
+    const reviewDetails = {
+      roomId,
+      userName: user?.displayName,
       rating: selectedRating,
       comment: reviewComment,
-      email : user.email
-
+      email: user?.email,
     };
 
-    console.log(reviewData)
-   await fetch('http://localhost:5000/review', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reviewData),
-    });
-  
+    try {
+      const res = await fetch('http://localhost:5000/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewDetails),
+      });
+
+      if (res.ok) {
+        setReviews((prev) => [...prev, reviewDetails]);
+        closeReviewModal(false);
+        alert('Review submitted successfully!');
+      } else {
+        alert('Failed to submit review. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('An error occurred while submitting your review. Please try again.');
+    }
   };
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-8 bg-white text-gray-800 shadow-lg rounded-lg">
-      {/* Room Image */}
       <div className="mb-6">
         <img
           src={images}
@@ -178,14 +168,12 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
         />
       </div>
 
-      {/* Room Info */}
       <h2 className="text-3xl font-bold mb-4 text-gray-900">{name}</h2>
       <p className="text-lg text-gray-600 mb-4">{description}</p>
       <p className="text-xl font-semibold mb-4">
         Price: <span className="text-blue-500">${price} / night</span>
       </p>
 
-      {/* Features */}
       <div className="mb-4">
         <h3 className="text-2xl font-semibold mb-3 text-gray-900">Features:</h3>
         <ul className="list-disc pl-6 space-y-2">
@@ -197,7 +185,6 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
         </ul>
       </div>
 
-      {/* Rating and Reviews */}
       <div className="flex items-center justify-between mb-6">
         <p className="text-lg font-semibold text-gray-900">
           Rating: <span className="text-yellow-500">{rating}★</span>
@@ -207,9 +194,6 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
         </p>
       </div>
 
-    
-
-      {/* Book Now Button */}
       <button
         className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 ${
           availability
@@ -222,55 +206,43 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
         Book Now
       </button>
 
-      {/* Leave a Review Button */}
-      
-         
-         {
+      {userHasBooking && (
+        <button
+          className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
+          onClick={openReviewModal}
+        >
+          Give Review
+        </button>
+      )}
 
-         hiddenCom.length > 0 ?   <button
-         className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
-         onClick={openReviewModal}
-       >
-         Give Review
-       </button>:''
-          
-         }
- 
-      
-    {/* Review Section */}
-    <div className="mb-6">
+      <div className="mb-6">
         <h3 className="text-2xl font-semibold mb-4">Reviews</h3>
         {singleReviews.map((review, index) => (
-          <Review key={index} review={review}/>
+          <Review key={index} review={review} />
         ))}
       </div>
 
-      {/* Booking Modal */}
       {isBookingModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300">
-          <div className="bg-white w-96 rounded-lg shadow-lg p-6 transform transition-all duration-500 ease-in-out scale-110">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white w-96 rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-bold mb-4">Booking Summary</h2>
             <p className="text-gray-700 mb-2">Room Name: {name}</p>
             <p className="text-gray-700 mb-2">Price: ${price} / night</p>
-            <p className="text-gray-600 mb-4">Description: {description}</p>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Select Booking Date:</label>
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                className="w-full border border-gray-300 rounded-md p-2"
-                minDate={new Date()}
-              />
-            </div>
-            <div className="flex items-center justify-between">
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              className="w-full border border-gray-300 rounded-md p-2"
+              minDate={new Date()}
+            />
+            <div className="flex items-center justify-between mt-4">
               <button
-                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+                className="bg-blue-500 text-white py-2 px-4 rounded-md"
                 onClick={handleBooking}
               >
                 Confirm Booking
               </button>
               <button
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300"
+                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
                 onClick={closeBookingModal}
               >
                 Cancel
@@ -280,52 +252,24 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
         </div>
       )}
 
-      {/* Review Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300">
-          <div className="bg-white w-96 rounded-lg shadow-lg p-6 transform transition-all duration-500 ease-in-out scale-110">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white w-96 rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-bold mb-4">Leave a Review</h2>
-            <p className="text-gray-700 mb-2">Username: {username}</p>
             <div className="mb-4">
-            <div className="rating">
-      <input
-        type="radio"
-        name="rating-2"
-        value="1"
-        className="mask mask-star-2 bg-orange-400"
-        onChange={handleRatingChange}
-      />
-      <input
-        type="radio"
-        name="rating-2"
-        value="2"
-        className="mask mask-star-2 bg-orange-400"
-        onChange={handleRatingChange}
-        defaultChecked
-      />
-      <input
-        type="radio"
-        name="rating-2"
-        value="3"
-        className="mask mask-star-2 bg-orange-400"
-        onChange={handleRatingChange}
-      />
-      <input
-        type="radio"
-        name="rating-2"
-        value="4"
-        className="mask mask-star-2 bg-orange-400"
-        onChange={handleRatingChange}
-      />
-      <input
-        type="radio"
-        name="rating-2"
-        value="5"
-        className="mask mask-star-2 bg-orange-400"
-        onChange={handleRatingChange}
-      />
-    </div>
-     </div>
+              <div className="rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <input
+                    key={star}
+                    type="radio"
+                    name="rating"
+                    value={star}
+                    className="mask mask-star-2 bg-orange-400"
+                    onChange={() => setSelectedRating(star)}
+                  />
+                ))}
+              </div>
+            </div>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2 mb-4"
               rows="4"
@@ -335,13 +279,13 @@ const singleReviews = reviews.filter(user => user.roomId == data._id);
             ></textarea>
             <div className="flex items-center justify-between">
               <button
-                className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
+                className="bg-green-500 text-white py-2 px-4 rounded-md"
                 onClick={handleReviewSubmit}
               >
                 Submit Review
               </button>
               <button
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300"
+                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
                 onClick={closeReviewModal}
               >
                 Cancel
