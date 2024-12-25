@@ -48,7 +48,7 @@ const {id} = useParams();
 
   
 
-  console.log(id)
+  const [showBtn,setShowBtn] = useState([]);
   useEffect(()=>{
     fetch(`http://localhost:5000/review?roomId=${id}`)
     .then(res=>res.json())
@@ -56,8 +56,14 @@ const {id} = useParams();
    setReviews(data)
     })
 
+    fetch(`http://localhost:5000/apply?booking_id=${id}`)
+    .then(res=>res.json())
+    .then(data=>{
+   setShowBtn(data)
+    })
 
-  },[])
+  },[id])
+
 
 
   
@@ -202,7 +208,7 @@ const {id} = useParams();
 
       <button
         className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 ${
-          availability
+          showBtn.length <= 0 
             ? 'bg-blue-500 text-white hover:bg-blue-600'
             : 'bg-gray-400 text-gray-700 cursor-not-allowed'
         }`}
@@ -212,13 +218,16 @@ const {id} = useParams();
         Book Now
       </button>
 
-      
-  <button
-    className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
-    onClick={openReviewModal}
-  >
-    Give Review
-  </button>
+      {
+        showBtn.length > 0?  <button
+        className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
+        onClick={openReviewModal}
+      >
+        Give Review
+      </button>:''
+      }
+
+
 
 
     
