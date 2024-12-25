@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import { FaTrashAlt, FaRegEdit } from 'react-icons/fa';  // Adding icons for better visual cues
+import { FaTrashAlt, FaRegEdit } from 'react-icons/fa';
 
 function MyBooking() {
   const [apply, setApply] = useState([]);
@@ -13,10 +13,12 @@ function MyBooking() {
 
   // Fetching booking data
   useEffect(() => {
-    fetch(`http://localhost:5000/apply?email=${user?.email}`)
-      .then(res => res.json())
-      .then(data => setApply(data))
-      .catch(error => console.log(error));
+    if (user?.email) {
+      fetch(`http://localhost:5000/apply?email=${user?.email}`)
+        .then(res => res.json())
+        .then(data => setApply(data))
+        .catch(error => console.log(error));
+    }
   }, [user?.email]);
 
   // Handle Cancel Booking
@@ -46,8 +48,7 @@ function MyBooking() {
     })
       .then(res => res.json())
       .then(() => {
-        setApply(prevApply => prevApply.filter(item => item._id !== selectedBooking));
-        setShowModal(false);
+        setApply(prevApply => prevApply.filter(item => item._id !== id));
         setToastMessage('Booking cancelled successfully');
         setShowToast(true);
       })
@@ -114,6 +115,7 @@ function MyBooking() {
                       className="bg-red-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-red-600"
                     >
                       <FaTrashAlt className="inline-block mr-2" />
+                      Cancel
                     </button>
 
                     <button
@@ -121,6 +123,7 @@ function MyBooking() {
                       className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                     >
                       <FaRegEdit className="inline-block mr-2" />
+                      Update
                     </button>
                   </td>
                 </tr>

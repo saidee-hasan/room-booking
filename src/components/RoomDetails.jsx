@@ -207,25 +207,31 @@ const {id} = useParams();
       </div>
 
       <button
-        className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 ${
-          showBtn.length <= 0 
-            ? 'bg-blue-500 text-white hover:bg-blue-600'
-            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-        }`}
-        onClick={openBookingModal}
-        disabled={!availability}
-      >
-        Book Now
-      </button>
+  className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 ${
+    showBtn.length <= 0
+      ? 'bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-300'
+      : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+  }`}
+  onClick={openBookingModal}
+  disabled={showBtn.length > 0}
+>
+  {showBtn.length > 0 ? 'Booking Unavailable' : 'Book Now'}
+</button>
 
-      {
-        showBtn.length > 0?  <button
-        className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-600"
-        onClick={openReviewModal}
-      >
-        Give Review
-      </button>:''
-      }
+
+{
+  showBtn.length > 0 ? (
+    <button
+      className="w-full mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-md transition-transform transform hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+      onClick={openReviewModal}
+      disabled={showBtn.length === 0}
+    >
+      Give Review
+    </button>
+  ) : (
+    ''
+  )
+}
 
 
 
