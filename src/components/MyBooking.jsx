@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
+import { FaTrashAlt, FaRegEdit } from 'react-icons/fa';  // Adding icons for better visual cues
 
 function MyBooking() {
   const [apply, setApply] = useState([]);
@@ -8,7 +9,7 @@ function MyBooking() {
   const [newDate, setNewDate] = useState('');
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   // Fetching booking data
   useEffect(() => {
@@ -16,36 +17,29 @@ function MyBooking() {
       .then(res => res.json())
       .then(data => setApply(data))
       .catch(error => console.log(error));
-  }, []);
+  }, [user?.email]);
 
- // Handle Cancel Booking
- const handleCancel = (bookingId) => {
-  const booking = apply.find((item) => item._id === bookingId);
-  console.log(booking)
-  if (booking) {
-    const bookingDate = new Date(booking.selectedDate);
-    console.log(bookingDate)
-    const cancelBeforeDate = new Date(bookingDate);
-    console.log(cancelBeforeDate)
+  // Handle Cancel Booking
+  const handleCancel = (bookingId) => {
+    const booking = apply.find((item) => item._id === bookingId);
+    if (booking) {
+      const bookingDate = new Date(booking.selectedDate);
+      const cancelBeforeDate = new Date(bookingDate);
+      cancelBeforeDate.setDate(cancelBeforeDate.getDate() - 2); // 2 days before booking date
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Remove time component for comparison
 
-    cancelBeforeDate.setDate(cancelBeforeDate.getDate() - 2); // 1 day before booking date
-    console.log(cancelBeforeDate)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set today's date without the time component
-console.log(today)
-    // If today is on or before the cancellation deadline, allow cancellation
-    if (today <= cancelBeforeDate) {
-      confirmCancel(bookingId);
-    } else {
-      setToastMessage('Cancellation period has passed. You can only cancel 2 day before the booked date.');
-      setShowToast(true);
+      // If today is on or before the cancellation deadline, allow cancellation
+      if (today <= cancelBeforeDate) {
+        confirmCancel(bookingId);
+      } else {
+        setToastMessage('Cancellation period has passed. You can only cancel 2 days before the booked date.');
+        setShowToast(true);
+      }
     }
-  }
-
-
   };
 
-  const confirmCancel = (id)=> {
+  const confirmCancel = (id) => {
     // Make an API call to cancel the booking
     fetch(`http://localhost:5000/apply/${id}`, {
       method: 'DELETE',
@@ -92,58 +86,56 @@ console.log(today)
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">My Bookings</h2>
+    <div className="p-6 bg-gray-100">
+      <h2 className="text-3xl font-bold mb-6 text-center">My Bookings</h2>
 
       {apply.length > 0 ? (
-        <table className="min-w-full table-auto border-collapse border border-gray-200">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2 text-left">Room Name</th>
-              <th className="border px-4 py-2 text-left">Description</th>
-              <th className="border px-4 py-2 text-left">Price</th>
-              <th className="border px-4 py-2 text-left">Booking Date</th>
-              <th className="border px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {apply.map(booking => (
-              <tr key={booking._id}>
-                <td className="border px-4 py-2">{booking.roomName}</td>
-                <td className="border px-4 py-2">{booking.roomDescription}</td>
-                <td className="border px-4 py-2">${booking.roomPrice}</td>
-                <td className="border px-4 py-2">{booking.selectedDate}</td>
-                <td className="border px-4 py-2">
-                  <button
-                    onClick={() => handleCancel(booking._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-red-600"
-                  >
-                    Cancel
-                  </button>
-
-
-
-
-                  
-                  <button
-                    onClick={() => handleUpdateDate(booking._id)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                  >
-                    Update Date
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto bg-white rounded-lg shadow-md">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border px-4 py-2 text-left">Room Name</th>
+                <th className="border px-4 py-2 text-left">Description</th>
+                <th className="border px-4 py-2 text-left">Price</th>
+                <th className="border px-4 py-2 text-left">Booking Date</th>
+                <th className="border px-4 py-2 text-left">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {apply.map(booking => (
+                <tr key={booking._id} className="hover:bg-gray-100">
+                  <td className="border px-4 py-2">{booking.roomName}</td>
+                  <td className="border px-4 py-2">{booking.roomDescription}</td>
+                  <td className="border px-4 py-2">${booking.roomPrice}</td>
+                  <td className="border px-4 py-2">{booking.selectedDate}</td>
+                  <td className="border px-4 py-2">
+                    <button
+                      onClick={() => handleCancel(booking._id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-red-600"
+                    >
+                      <FaTrashAlt className="inline-block mr-2" />
+                    </button>
+
+                    <button
+                      onClick={() => handleUpdateDate(booking._id)}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    >
+                      <FaRegEdit className="inline-block mr-2" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p className="mt-4">No bookings found.</p>
+        <p className="mt-4 text-center text-gray-500">No bookings found.</p>
       )}
 
       {/* Modal for cancel confirmation */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-96">
+          <div className="bg-white p-6 rounded-lg w-full sm:w-96">
             <h3 className="text-xl font-bold mb-4">Update Booking Date</h3>
             <input
               type="date"
@@ -171,7 +163,7 @@ console.log(today)
 
       {/* Toast notification */}
       {showToast && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300">
           <p>{toastMessage}</p>
         </div>
       )}
