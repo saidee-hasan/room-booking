@@ -10,6 +10,7 @@ import Login from "../components/Login";
 import UserProfile from "../components/UserProfile";
 import UpdateProfile from "../components/UpdateProfile";
 import PrivateRoute from "./PrivateRoute";
+import NotFound from "../components/NotFound";
 
 
 
@@ -19,6 +20,7 @@ const router =  createBrowserRouter([
     {path:"/",element:<MainLayout/>,children:[
 
         {path:"/",element:<Home/>},
+        {path:"*",element:<NotFound/>},
 
         {path:"/profile",element:<PrivateRoute><UserProfile/> </PrivateRoute> },
         {path:"/register",element:<Register/>},

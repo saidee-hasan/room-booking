@@ -69,17 +69,13 @@ function MyBooking() {
   
 
   const confirmCancel = (id) => {
-    // Make an API call to cancel the booking
-    fetch(`http://localhost:5000/apply/${id}`, {
-      method: 'DELETE',
+    axios.delete(`http://localhost:5000/apply/${id}`, { withCredentials: true })
+    .then(() => {
+      setApply(prevApply => prevApply.filter(item => item._id !== id));
+      setToastMessage('Booking cancelled successfully');
+      setShowToast(true);
     })
-      .then(res => res.json())
-      .then(() => {
-        setApply(prevApply => prevApply.filter(item => item._id !== id));
-        setToastMessage('Booking cancelled successfully');
-        setShowToast(true);
-      })
-      .catch(error => console.log(error));
+    .catch(error => console.log(error));
   };
 
   // Handle Update Date
