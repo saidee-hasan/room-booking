@@ -14,8 +14,8 @@ function Home() {
   }, []);
 
   return (
-    <div className="container mx-auto">
-      Special Offers Modal
+    <div className="container mx-auto mt-16">
+
       {isModalOpen && (
         <SpecialOffersModal  onClose={() => setIsModalOpen(false)} />
       )}

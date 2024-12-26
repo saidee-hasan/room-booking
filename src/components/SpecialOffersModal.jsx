@@ -6,7 +6,7 @@ function SpecialOffersModal({ onClose }) {
       <div className="bg-white w-11/12 sm:w-96 rounded-lg shadow-lg overflow-hidden">
         {/* Modal Header */}
         <div className="p-4 bg-lime-700 text-white flex justify-between items-center">
-          <h2 className="text-xl font-bold">Special Offers & Promotions</h2>
+         
           <button
             onClick={onClose}
             className="text-white hover:text-gray-300 focus:outline-none text-2xl"
