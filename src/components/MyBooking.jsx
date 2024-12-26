@@ -69,12 +69,19 @@ function MyBooking() {
   
 
   const confirmCancel = (id) => {
+
     axios.delete(`http://localhost:5000/apply/${id}`, { withCredentials: true })
+
     .then(() => {
+
       setApply(prevApply => prevApply.filter(item => item._id !== id));
+
       setToastMessage('Booking cancelled successfully');
+
       setShowToast(true);
+
     })
+
     .catch(error => console.log(error));
   };
 

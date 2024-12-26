@@ -52,15 +52,20 @@ function RoomDetails() {
       .then(res => res.json())
       .then(data => {
         setReviews(data);
+        
       });
+      
 
-    fetch(`http://localhost:5000/apply?booking_id=${id}`)
+    fetch(`http://localhost:5000/appl?id=${id}`)
       .then(res => res.json())
       .then(data => {
         setShowBtn(data);
       });
-  }, [id]);
 
+
+      
+  }, [id]);
+console.log(id)
   const openBookingModal = () => {
     if (!availability) {
       alert('This room is currently unavailable for booking.');
@@ -171,7 +176,6 @@ function RoomDetails() {
     }
   };
 
-  console.log(reviews);
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-8 bg-white text-gray-800 shadow-lg rounded-lg">
@@ -214,6 +218,7 @@ function RoomDetails() {
       </div>
 
       {/* Book Now Button */}
+      
       <button
         className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 ${
           showBtn.length <= 0

@@ -18,7 +18,7 @@ function SpecialOffersModal({ onClose }) {
         {/* Modal Body */}
         <div className="p-6">
           <img
-            src="https://via.placeholder.com/400x200" // Replace with your offer image
+            src="https://i.ibb.co.com/Mfds25s/download-5.jpg" // Replace with your offer image
             alt="Special Offer"
             className="w-full h-40 object-cover rounded-lg mb-4"
           />

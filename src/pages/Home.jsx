@@ -4,6 +4,8 @@ import Map from "../components/Map";
 import FeaturedRooms from "../components/Rooms";
 import SpecialOffersModal from "../components/SpecialOffersModal";
 import TestimonialCarousel from "../components/TestimonialCarousel";
+import Questions from "../components/Questions";
+
 
 function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +26,8 @@ function Home() {
       <Map />
       <FeaturedRooms />
       <TestimonialCarousel/>
+      <Questions/>
+
     </div>
   );
 }

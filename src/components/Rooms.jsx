@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function Rooms() {
   const [rooms, setRooms] = useState([]);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
   // Fetch rooms based on filters
   const fetchRooms = () => {
@@ -16,7 +16,7 @@ function Rooms() {
     fetch(`http://localhost:5000/rooms?${query.toString()}`)
       .then((res) => res.json())
       .then((data) => setRooms(data))
-      .catch((error) => console.error('Error fetching rooms:', error));
+      .catch((error) => console.error("Error fetching rooms:", error));
   };
 
   useEffect(() => {
@@ -29,7 +29,7 @@ function Rooms() {
   };
 
   return (
-    <div className="bg-slate-50 py-12">
+    <div className="bg-slate-50 py-12 mt-10">
       <h2 className="text-3xl font-semibold text-center text-gray-800 mb-8">
         Featured Rooms
       </h2>
@@ -76,13 +76,13 @@ function Rooms() {
               className="w-full h-48 object-cover"
             />
             <div className="p-4">
-              <h3 className="text-xl font-semibold text-gray-800">{room.name}</h3>
+              <h3 className="text-xl font-semibold text-gray-800">
+                {room.name}
+              </h3>
               <p className="text-gray-600 text-sm mt-2">{room.description}</p>
               <p className="text-gray-800 font-bold mt-4">${room.price}</p>
               <Link to={`/rooms/${room._id}`}>
-                <button
-                  className="mt-4 bg-lime-700 text-white py-2 px-4 rounded-md hover:bg-lime-900 transition duration-300 w-full"
-                >
+                <button className="mt-4 bg-lime-700 text-white py-2 px-4 rounded-md hover:bg-lime-900 transition duration-300 w-full">
                   Book Now
                 </button>
               </Link>

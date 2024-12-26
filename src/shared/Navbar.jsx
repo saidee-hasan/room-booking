@@ -85,7 +85,16 @@ function Navbar({ isAuthenticated }) {
                   My Bookings
                 </NavLink>
               </li>
+
             )}
+                <li>
+              <NavLink
+                to="/about"
+                className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
+              >
+                About US
+              </NavLink>
+            </li>
           </ul>
         </div>
 

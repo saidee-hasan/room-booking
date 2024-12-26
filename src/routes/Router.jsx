@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import Home from "../pages/Home";
@@ -11,30 +10,57 @@ import UserProfile from "../components/UserProfile";
 import UpdateProfile from "../components/UpdateProfile";
 import PrivateRoute from "./PrivateRoute";
 import NotFound from "../components/NotFound";
+import ForgotPassword from "../components/ForgotPassword";
+import About from "../components/About";
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "*", element: <NotFound /> },
+      { path: "/about", element: <About /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
 
-
-
-
-const router =  createBrowserRouter([
-    {path:"/",element:<MainLayout/>,children:[
-
-        {path:"/",element:<Home/>},
-        {path:"*",element:<NotFound/>},
-
-        {path:"/profile",element:<PrivateRoute><UserProfile/> </PrivateRoute> },
-        {path:"/register",element:<Register/>},
-        {path:"/update",element:<PrivateRoute><UpdateProfile/></PrivateRoute> },
-        {path:"/login",element:<Login/>},
-        {path:"/rooms",element:<Rooms/>},
-        {path:"/my-bookings",element:<PrivateRoute><MyBooking/></PrivateRoute> },
-        {path:"/rooms/:id",element:<PrivateRoute><RoomDetails/></PrivateRoute>   ,loader:({params})=> fetch(`http://localhost:5000/rooms/${params.id}`)},
-        
-       
-
-    ]},
-  
-   
-
-])
+      {
+        path: "/profile",
+        element: (
+          <PrivateRoute>
+            <UserProfile />{" "}
+          </PrivateRoute>
+        ),
+      },
+      { path: "/register", element: <Register /> },
+      {
+        path: "/update",
+        element: (
+          <PrivateRoute>
+            <UpdateProfile />
+          </PrivateRoute>
+        ),
+      },
+      { path: "/login", element: <Login /> },
+      { path: "/rooms", element: <Rooms /> },
+      {
+        path: "/my-bookings",
+        element: (
+          <PrivateRoute>
+            <MyBooking />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/rooms/:id",
+        element: (
+          <PrivateRoute>
+            <RoomDetails />
+          </PrivateRoute>
+        ),
+        loader: ({ params }) =>
+          fetch(`http://localhost:5000/rooms/${params.id}`),
+      },
+    ],
+  },
+]);
 export default router;
