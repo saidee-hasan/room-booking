@@ -22,10 +22,14 @@ export default function Login() {
     setError(""); // Clear previous errors
 
     try {
-      const res = await loginUser (email, password);
+      const res = await loginUser (email, password)
+
+   
+
       if (res) {
         handleToast("User  Login Successfully");
         navigate("/");
+        console.log(res)
       }
     } catch (err) {
       console.error(err);

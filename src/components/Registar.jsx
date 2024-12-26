@@ -7,6 +7,7 @@ import { Bounce, toast, ToastContainer } from 'react-toastify';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { AuthContext } from '../provider/AuthProvider';
 import { auth } from '../../firebase.init';
+import axios from 'axios';
 
 export default function Register() {
   
@@ -39,7 +40,12 @@ export default function Register() {
     try {
       await createUser (email, password, username, photoURL)
         .then(res => {
+        
           if (res) {
+
+
+
+
             handleToast('User  registered successfully');
           } else {
             // Handle error if needed
@@ -79,7 +85,14 @@ export default function Register() {
   const provider = new GoogleAuthProvider();
   const handleLogin = () => {
     signInWithPopup(auth, provider)
+  
       .then((res) => {
+        const user = {email : res.user.email};
+        axios.post('http://localhost:5000/jwt',user,{withCredentials:true})
+        .then(data=>{
+          console.log(data)
+        })
+
         navigate("/");
       })
       .catch((error) => {

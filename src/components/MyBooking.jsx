@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import { FaTrashAlt, FaRegEdit } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 function MyBooking() {
   const [apply, setApply] = useState([]);
@@ -15,10 +16,15 @@ function MyBooking() {
   // Fetching booking data
   useEffect(() => {
     if (user?.email) {
-      fetch(`http://localhost:5000/apply?email=${user?.email}`)
-        .then(res => res.json())
-        .then(data => setApply(data))
-        .catch(error => console.log(error));
+      // fetch(`http://localhost:5000/apply?email=${user?.email}`)
+      //   .then(res => res.json())
+      //   .then(data => setApply(data))
+      //   .catch(error => console.log(error));
+      axios.get(`http://localhost:5000/apply?email=${user?.email}`,{withCredentials:true})
+      .then(res => setApply(res.data))
+
+
+
     }
   }, [user?.email]);
 
