@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import { FaTrashAlt, FaRegEdit } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 function MyBooking() {
   const [apply, setApply] = useState([]);
@@ -30,16 +31,36 @@ function MyBooking() {
       cancelBeforeDate.setDate(cancelBeforeDate.getDate() - 2); // 2 days before booking date
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Remove time component for comparison
-
-      // If today is on or before the cancellation deadline, allow cancellation
+  
       if (today <= cancelBeforeDate) {
-        confirmCancel(bookingId);
+        // Show SweetAlert2 confirmation modal
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Confirm cancellation
+            confirmCancel(bookingId); // Move the cancellation call inside the confirmation block
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your booking has been canceled.",
+              icon: "success"
+            });
+          }
+        });
       } else {
+        // If cancellation period has passed
         setToastMessage('Cancellation period has passed. You can only cancel 2 days before the booked date.');
         setShowToast(true);
       }
     }
   };
+  
 
   const confirmCancel = (id) => {
     // Make an API call to cancel the booking
