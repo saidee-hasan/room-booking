@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { AuthContext } from '../provider/AuthProvider';
-
+import Logo from "../assets/Logo.png"
 function Navbar({ isAuthenticated }) {
   const { user, signOutUser  } = useContext(AuthContext);
 
@@ -34,27 +34,46 @@ function Navbar({ isAuthenticated }) {
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
               <li>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
+              >
+               Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/rooms"
+                className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
+              >
+                Rooms
+              </NavLink>
+            </li>
+            {isAuthenticated && (
+              <li>
                 <NavLink
-                  to="/rooms"
+                  to="/my-bookings"
                   className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
                 >
-                  Rooms
+                  My Bookings
                 </NavLink>
               </li>
-              {isAuthenticated && (
+
+            )}
                 <li>
-                  <NavLink
-                    to="/my-booking"
-                    className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
-                  >
-                    My Bookings
-                  </NavLink>
-                </li>
-              )}
+              <NavLink
+                to="/about"
+                className={({ isActive }) => (isActive ? 'text-orange-400' : '')}
+              >
+                About US
+              </NavLink>
+            </li>
             </ul>
           </div>
-          <NavLink to="/" className="btn btn-ghost text-xl font-bold">
-   Room <span className='text-red-500'> Booking</span>
+          <NavLink to="/" className=" flex text-xl font-bold">
+          <img className='w-10' src={Logo} alt="" />
+          <p className='sm:block hidden '>   Room <span className='text-red-500'> Booking</span></p>
+
           </NavLink>
         </div>
 

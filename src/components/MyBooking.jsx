@@ -1,30 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import useAuth from '../hooks/useAuth';
-import { FaTrashAlt, FaRegEdit } from 'react-icons/fa';
-import Swal from 'sweetalert2';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import useAuth from "../hooks/useAuth";
+import { FaTrashAlt, FaRegEdit } from "react-icons/fa";
+import Swal from "sweetalert2";
+import axios from "axios";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 function MyBooking() {
   const [apply, setApply] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [newDate, setNewDate] = useState('');
-  const [toastMessage, setToastMessage] = useState('');
+  const [newDate, setNewDate] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const { user } = useAuth();
-
+const axiosSecure = useAxiosSecure()
   // Fetching booking data
   useEffect(() => {
     if (user?.email) {
-      // fetch(`http://localhost:5000/apply?email=${user?.email}`)
-      //   .then(res => res.json())
-      //   .then(data => setApply(data))
-      //   .catch(error => console.log(error));
-      axios.get(`http://localhost:5000/apply?email=${user?.email}`,{withCredentials:true})
-      .then(res => setApply(res.data))
-
-
-
+     axiosSecure
+        .get(`/apply?email=${user?.email}`, {
+          withCredentials: true,
+        })
+        .then((res) => setApply(res.data));
     }
   }, [user?.email]);
 
@@ -37,7 +34,7 @@ function MyBooking() {
       cancelBeforeDate.setDate(cancelBeforeDate.getDate() - 2); // 2 days before booking date
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Remove time component for comparison
-  
+
       if (today <= cancelBeforeDate) {
         // Show SweetAlert2 confirmation modal
         Swal.fire({
@@ -47,7 +44,7 @@ function MyBooking() {
           showCancelButton: true,
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
-          confirmButtonText: "Yes, delete it!"
+          confirmButtonText: "Yes, delete it!",
         }).then((result) => {
           if (result.isConfirmed) {
             // Confirm cancellation
@@ -55,64 +52,77 @@ function MyBooking() {
             Swal.fire({
               title: "Deleted!",
               text: "Your booking has been canceled.",
-              icon: "success"
+              icon: "success",
             });
           }
         });
       } else {
         // If cancellation period has passed
-        setToastMessage('Cancellation period has passed. You can only cancel 2 days before the booked date.');
+        setToastMessage(
+          "Cancellation period has passed. You can only cancel 2 days before the booked date."
+        );
         setShowToast(true);
       }
     }
   };
-  
 
   const confirmCancel = (id) => {
+   axiosSecure
+      .delete(`/apply/${id}`, {
+        withCredentials: true,
+      })
 
-    axios.delete(`http://localhost:5000/apply/${id}`, { withCredentials: true })
+      .then(() => {
+        setApply((prevApply) => prevApply.filter((item) => item._id !== id));
 
-    .then(() => {
+        setToastMessage("Booking cancelled successfully");
 
-      setApply(prevApply => prevApply.filter(item => item._id !== id));
+        setShowToast(true);
+      })
 
-      setToastMessage('Booking cancelled successfully');
-
-      setShowToast(true);
-
-    })
-
-    .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
 
   // Handle Update Date
   const handleUpdateDate = (bookingId) => {
     setSelectedBooking(bookingId); // Store the bookingId for which the date will be updated
-    const updatedBooking = apply.find(item => item._id === bookingId);
+    const updatedBooking = apply.find((item) => item._id === bookingId);
     if (updatedBooking) {
       setNewDate(updatedBooking.selectedDate); // Set the existing booking date as the initial value
     }
     setShowModal(true); // Show the modal for updating the date
   };
 
+  const [loading, setLoading] = useState(false);
+
   const confirmUpdateDate = () => {
     if (newDate && selectedBooking) {
-      fetch(`http://localhost:5000/apply/${selectedBooking}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ selectedDate: newDate }),
-      })
-        .then(res => res.json())
-        .then(() => {
-          setApply(prevApply => prevApply.map(item =>
-            item._id === selectedBooking ? { ...item, selectedDate: newDate } : item
-          ));
-          setToastMessage('Booking date updated successfully');
+      setLoading(true); // Set loading state to true
+      axiosSecure
+        .put(`/apply/${selectedBooking}`, {
+          selectedDate: newDate,
+        })
+        .then((response) => {
+          setApply((prevApply) =>
+            prevApply.map((item) =>
+              item._id === selectedBooking
+                ? { ...item, selectedDate: newDate }
+                : item
+            )
+          );
+          setToastMessage("Booking date updated successfully");
           setShowToast(true);
-          setNewDate(''); // Clear the date input after successful update
+          setNewDate(""); // Clear the date input after successful update
           setShowModal(false); // Close the modal
         })
-        .catch(error => console.log(error));
+        .catch((error) => {
+          console.error("Error updating booking date:", error);
+          setToastMessage("Failed to update booking date");
+          setShowToast(true);
+        })
+        .finally(() => {
+          setLoading(false); // Reset loading state
+        });
     }
   };
 
@@ -133,10 +143,12 @@ function MyBooking() {
               </tr>
             </thead>
             <tbody>
-              {apply.map(booking => (
+              {apply.map((booking) => (
                 <tr key={booking._id} className="hover:bg-gray-100">
                   <td className="border px-4 py-2">{booking.roomName}</td>
-                  <td className="border px-4 py-2">{booking.roomDescription}</td>
+                  <td className="border px-4 py-2">
+                    {booking.roomDescription}
+                  </td>
                   <td className="border px-4 py-2">${booking.roomPrice}</td>
                   <td className="border px-4 py-2">{booking.selectedDate}</td>
                   <td className="border px-4 py-2">

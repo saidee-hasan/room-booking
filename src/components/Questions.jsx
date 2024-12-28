@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function Questions() {
   const faqs = [
@@ -24,14 +24,30 @@ function Questions() {
     },
   ];
 
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <div className="container mx-auto py-8">
       <h2 className="text-2xl font-bold text-center mb-6">Frequently Asked Questions</h2>
       <div className="bg-white shadow-md rounded-lg p-6">
         {faqs.map((faq, index) => (
-          <div key={index} className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">{faq.question}</h3>
-            <p className="text-gray-600">{faq.answer}</p>
+          <div key={index} className="mb-4 border-b last:border-b-0">
+            <h3 
+              className="text-lg font-semibold text-gray-800 cursor-pointer flex justify-between items-center"
+              onClick={() => toggleFAQ(index)}
+            >
+              {faq.question}
+              <span className={`ml-2 transition-transform ${openIndex === index ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
+            </h3>
+            {openIndex === index && (
+              <p className="text-gray-600 mt-2">{faq.answer}</p>
+            )}
           </div>
         ))}
       </div>

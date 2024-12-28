@@ -30,15 +30,9 @@ function Register() {
   const [error, setError] = useState("");
   const provider = new GoogleAuthProvider();
   const handleLogin = () => {
+    
     signInWithPopup(auth, provider)
       .then((res) => {
-        axios
-          .post("http://localhost:5000/jwt", user, {
-            withCredentials: true,
-          })
-          .then((data) => {
-            console.log(data);
-          });
         navigate("/");
       })
       .catch((error) => {

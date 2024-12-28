@@ -5,7 +5,7 @@ const slides = [
     {
         id: 1,
         image: 'https://img.freepik.com/free-photo/yellow-living-room-interior-with-free-space_43614-934.jpg',
-        title: 'Unlock a World of Languages',
+        title: 'Unlock a World of Rooms',
         description: 'Join our community and start your language journey today!',
         cta: 'Explore Rooms',
         link: '/rooms' // Updated link to redirect to Rooms page
@@ -38,7 +38,7 @@ const Banner = () => {
                     index === currentSlide && (
                         <motion.div
                             key={slide.id}
-                            className="absolute inset-0 rounded-md bg-slate-300"
+                            className="absolute inset-0 rounded-md bg-slate-100"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}

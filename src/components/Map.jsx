@@ -20,41 +20,43 @@ function Map() {
   const position = [23.8103, 90.4125]; // Example coordinates for Dhaka, Bangladesh
 
   return (
-    <div className="">        <h1 className='text-center text-xl font-bold'>Googles Map</h1>
-    <div className="md:flex bg-slate-50 p-4 gap-6">
+    <div>
+      <h1 className='text-center text-xl font-bold'>Google Map</h1>
+      <div className="md:flex p-4 gap-6">
 
-      {/* Informational Section */}
-      <div className="p-6 bg-gray-100 rounded-lg shadow-md flex-1">
-        <h3 className="font-sans text-2xl font-semibold text-gray-800 mb-4">
-          We are pleased to inform you that you have successfully passed the first round of the selection process! 🎉
-          <br />
-          Your application and skills have impressed us, and we are excited to move forward with you in the next stages.
-        </h3>
-        <button className="btn bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out">
-          Room
-        </button>
-      </div>
+        {/* Informational Section */}
+        <div className="p-6 bg-gray-100 rounded-lg shadow-md flex-1">
+          <h3 className="font-sans text-2xl font-semibold text-gray-800 mb-4">
+            We are pleased to inform you that you have successfully passed the first round of the selection process! 🎉
+            <br />
+            Your application and skills have impressed us, and we are excited to move forward with you in the next stages.
+          </h3>
+          <button className="btn bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out">
+            Room
+          </button>
+        </div>
 
-      {/* Map Section */}
-      <div className="w-full h-96 md:h-auto  z-0 flex-1 rounded-lg overflow-hidden shadow-md">
-        <MapContainer
-          center={position}
-          zoom={13}
-          scrollWheelZoom={false}
-          className="w-full md:h-96"
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <Marker position={position}>
-            <Popup>
-              The hotel's location. <br /> Easily customizable.
-            </Popup>
-          </Marker>
-        </MapContainer>
+        {/* Map Section */}
+        <div className="w-full h-96 md:h-auto flex-1 rounded-lg overflow-hidden shadow-md relative z-10">
+          <MapContainer
+            center={position}
+            zoom={13}
+            scrollWheelZoom={false}
+            className="w-full h-full" // Ensure the map takes full height
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <Marker position={position}>
+              <Popup>
+                The hotel's location. <br /> Easily customizable.
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
       </div>
-    </div></div>
+    </div>
   );
 }
 

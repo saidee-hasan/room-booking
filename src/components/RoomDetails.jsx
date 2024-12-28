@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import useAuth from '../hooks/useAuth';
-import Review from './Review';
-import moment from 'moment'; // Import Moment.js
-import Swal from 'sweetalert2';
+import React, { useState, useEffect } from "react";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import useAuth from "../hooks/useAuth";
+import Review from "./Review";
+import moment from "moment"; // Import Moment.js
+import Swal from "sweetalert2";
+import axios from "axios";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 function RoomDetails() {
   const { user } = useAuth();
@@ -17,8 +19,9 @@ function RoomDetails() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRating, setSelectedRating] = useState(4);
-  const [reviewComment, setReviewComment] = useState('');
+  const [reviewComment, setReviewComment] = useState("");
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
   const {
     _id: roomId,
     name,
@@ -34,11 +37,14 @@ function RoomDetails() {
 
   const fetchBookingData = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/apply?email=${user?.email}`);
-      const result = await res.json();
-      setBookingData(result);
+      const response = await axiosSecure.get(`/apply`, {
+        params: {
+          email: user?.email,
+        },
+      });
+      setBookingData(response.data);
     } catch (error) {
-      console.error('Error fetching booking data:', error);
+      console.error("Error fetching booking data:", error);
     }
   };
 
@@ -46,29 +52,27 @@ function RoomDetails() {
     fetchBookingData();
   }, [user?.email]);
 
-  const [showBtn, setShowBtn] = useState([]);
-  useEffect(() => {
-    fetch(`http://localhost:5000/review?roomId=${id}`)
-      .then(res => res.json())
-      .then(data => {
-        setReviews(data);
-        
-      });
-      
+  const [showBtn, setShowBtn] = useState(false);
 
-    fetch(`http://localhost:5000/appl?id=${id}`)
-      .then(res => res.json())
-      .then(data => {
+  useEffect(() => {
+    fetch(`https://room-booking-server-ten.vercel.app/review?roomId=${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setReviews(data);
+      });
+
+    fetch(
+      `https://room-booking-server-ten.vercel.app/appl?roomId=${id}&email=${user?.email}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         setShowBtn(data);
       });
+  }, [id, user?.email]);
 
-
-      
-  }, [id]);
-console.log(id)
   const openBookingModal = () => {
     if (!availability) {
-      alert('This room is currently unavailable for booking.');
+      alert("This room is currently unavailable for booking.");
       return;
     }
     setIsBookingModalOpen(true);
@@ -81,11 +85,11 @@ console.log(id)
 
   const handleBooking = async () => {
     if (!selectedDate) {
-      alert('Please select a booking date.');
+      alert("Please select a booking date.");
       return;
     }
 
-    const formattedDate = moment(selectedDate).format('MMMM Do YYYY'); // Format the selected date with Moment.js
+    const formattedDate = moment(selectedDate).format("MMMM Do YYYY"); // Format the selected date with Moment.js
 
     const bookingDetails = {
       roomName: name,
@@ -98,13 +102,16 @@ console.log(id)
     };
 
     try {
-      const res = await fetch('http://localhost:5000/apply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingDetails),
-      });
+      const res = await fetch(
+        "https://room-booking-server-ten.vercel.app/apply",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingDetails),
+        }
+      );
 
       if (res.ok) {
         const result = await res.json();
@@ -114,17 +121,19 @@ console.log(id)
         Swal.fire({
           title: "Good job!",
           text: "You clicked the button!",
-          icon: "success"
+          icon: "success",
         });
-        navigate('/my-bookings');
+        navigate("/my-bookings");
       } else {
         const errorData = await res.json();
-        
-        alert(`Booking failed: ${errorData.message || 'Please try again later.'}`);
+
+        alert(
+          `Booking failed: ${errorData.message || "Please try again later."}`
+        );
       }
     } catch (error) {
-      console.error('Error booking room:', error);
-      alert('An error occurred while booking. Please try again.');
+      console.error("Error booking room:", error);
+      alert("An error occurred while booking. Please try again.");
     }
   };
 
@@ -134,13 +143,13 @@ console.log(id)
 
   const closeReviewModal = () => {
     setSelectedRating(4);
-    setReviewComment('');
+    setReviewComment("");
     setIsReviewModalOpen(false);
   };
 
   const handleReviewSubmit = async () => {
     if (!selectedRating || !reviewComment.trim()) {
-      alert('Please provide both a rating and a comment.');
+      alert("Please provide both a rating and a comment.");
       return;
     }
 
@@ -155,27 +164,31 @@ console.log(id)
     };
 
     try {
-      const res = await fetch('http://localhost:5000/review', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reviewDetails),
-      });
+      const res = await fetch(
+        "https://room-booking-server-ten.vercel.app/review",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(reviewDetails),
+        }
+      );
 
       if (res.ok) {
         setReviews((prev) => [...prev, reviewDetails]);
         closeReviewModal(false);
-        alert('Review submitted successfully!');
+        alert("Review submitted successfully!");
       } else {
-        alert('Failed to submit review. Please try again.');
+        alert("Failed to submit review. Please try again.");
       }
     } catch (error) {
-      console.error('Error submitting review:', error);
-      alert('An error occurred while submitting your review. Please try again.');
+      console.error("Error submitting review:", error);
+      alert(
+        "An error occurred while submitting your review. Please try again."
+      );
     }
   };
-
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-8 bg-white text-gray-800 shadow-lg rounded-lg">
@@ -218,17 +231,18 @@ console.log(id)
       </div>
 
       {/* Book Now Button */}
-      
+
       <button
         className={`w-full font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 ${
-          showBtn.length <= 0
-            ? 'bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-300'
-            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+          showBtn.length > 0
+            ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+            : "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-300"
         }`}
-        onClick={openBookingModal}
-        disabled={showBtn.length > 0}
+        onClick={openBookingModal} // Only call the function if booking is available
+        disabled={showBtn.length > 0} // Disable the button if no booking is available
+        aria-disabled={showBtn.length > 0} // Accessibility: indicate that the button is disabled
       >
-        {showBtn.length > 0 ? 'Booking Unavailable' : 'Book Now'}
+        {showBtn.length > 0 ? "Booking Unavailable" : "Book Now"}
       </button>
 
       {/* Give Review Button */}

@@ -7,6 +7,7 @@ import TestimonialCarousel from "../components/TestimonialCarousel";
 import Questions from "../components/Questions";
 
 
+
 function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -16,7 +17,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="container mx-auto mt-16">
+    <div className="container mx-auto p-4 mt-16">
 
       {isModalOpen && (
         <SpecialOffersModal  onClose={() => setIsModalOpen(false)} />
@@ -25,8 +26,9 @@ function Home() {
       <Banner />
       <Map />
       <FeaturedRooms />
-      <TestimonialCarousel/>
+<TestimonialCarousel/>
       <Questions/>
+
 
     </div>
   );

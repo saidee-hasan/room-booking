@@ -7,7 +7,7 @@ function TestimonialCarousel() {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/review")
+    fetch("https://room-booking-server-ten.vercel.app/review")
       .then((res) => res.json())
       .then((data) => setReviews(data))
       .catch((error) => console.error("Error fetching reviews:", error));
@@ -21,6 +21,22 @@ function TestimonialCarousel() {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
+    responsive: [
+      {
+        breakpoint: 768, // Tablet and below
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 480, // Mobile devices
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
 
   return (
@@ -30,12 +46,14 @@ function TestimonialCarousel() {
       </h2>
 
       {reviews.length > 0 ? (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-md mx-auto">
+          {" "}
+          {/* Set a max width for mobile */}
           <Slider {...settings}>
             {reviews.map((review) => (
               <div
                 key={review._id}
-                className="p-6 h-80 bg-white text-center shadow-md rounded-md hover:shadow-xl transition-shadow duration-300 flex flex-col items-center"
+                className="p-4 h-auto bg-white text-center shadow-md rounded-md hover:shadow-xl transition-shadow duration-300 flex flex-col items-center"
               >
                 {/* User Image */}
                 <img

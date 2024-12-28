@@ -32,13 +32,7 @@ function Login() {
       const res = await loginUser(email, password);
 
       if (res) {
-        axios
-          .post("http://localhost:5000/jwt", user, {
-            withCredentials: true,
-          })
-          .then((data) => {
-            console.log(data);
-          });
+      
         toast.success("Login Successful!"); // Success toast
         navigate("/");
       }

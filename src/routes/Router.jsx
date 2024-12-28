@@ -58,7 +58,9 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:5000/rooms/${params.id}`),
+          fetch(
+            `https://room-booking-server-ten.vercel.app/rooms/${params.id}`
+          ),
       },
     ],
   },
